@@ -1,14 +1,28 @@
+import java.io.IOException;
 
 public class Run {
     private int startOffset; 
     private int endOffset;
     private int currOffset;
+    private Parser parser; 
     
     public Run()
     {
         startOffset = -1; 
         endOffset = -1;
-        currOffset = 0; 
+        currOffset = startOffset;
+    }
+    
+    public Run(int startOffset, int endOffset)
+    {
+        this.startOffset = startOffset; 
+        this.endOffset = endOffset;
+        currOffset = startOffset;
+    }
+    
+    public void setParser(Parser parser)
+    {
+        this.parser = parser; 
     }
     
     public void setStartOffset(int offset)
@@ -31,17 +45,20 @@ public class Run {
         return endOffset;
     }
     
-    public byte[] getNextBlock()
+    public byte[] getNextBlockOrRemaining() throws IOException
     {
         if (currOffset == endOffset)
         {
-            return null; 
+            return null;
         }
-        if (startOffset == -1 || endOffset == -1)
+        else if (currOffset + 8192 > endOffset)
+        { 
+            return parser.readRange(currOffset, endOffset); 
+        }
+        else
         {
-            return null; 
+            return parser.readRange(startOffset, startOffset + 8192);
         }
-        return new byte[1];
     }
 
 }

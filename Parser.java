@@ -14,6 +14,14 @@ public class Parser {
         offset = 0; 
     }
     
+    public byte[] readRange(int startOffset, int endOffset) throws IOException
+    {
+        int length = endOffset - startOffset; 
+        byte[] arr = new byte[length];
+        reader.readFully(arr, startOffset, length);
+        return arr;
+    }
+    
     public byte[] nextBlock() throws IOException
     {
         byte[] block; 

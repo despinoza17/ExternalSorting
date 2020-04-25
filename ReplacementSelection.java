@@ -39,8 +39,8 @@ public class ReplacementSelection {
         }
         
         int runs = 0;
-        int recordOffset = 0; 
-        int errorCount = 0;
+        int offset = 0;
+        int records = 0;
         Record prev = null;
         while (parser.hasNextBlock())
         {
@@ -50,13 +50,12 @@ public class ReplacementSelection {
                 if (outputBuffer.isFilled())
                 {
                     outputBuffer.unloadRun();
-                    recordOffset = 0;
-                    runs++;
                 }
                 
+
                 Record min = heap.getMin();
                 outputBuffer.insertRecordArr(min.getRawRecord());
-                recordOffset++; 
+                records++;
                 
                 if (inputBuffer.isEmpty())
                 {
@@ -68,7 +67,7 @@ public class ReplacementSelection {
                         if (currRecord.compareTo(min) == -1)
                         {
                             heap.hideMin(); 
-                            hiddenElements++; 
+                             
                         }
                     }
                     else
@@ -82,7 +81,6 @@ public class ReplacementSelection {
                                 Arrays.copyOfRange(arr,
                                         heap.heapSize() + 1, arr.length));
                         heap = new MinHeap<Record>(arr, arr.length, arr.length); 
-                        hiddenElements = 0;
                     }
                     
                 }
@@ -93,14 +91,18 @@ public class ReplacementSelection {
                     if (currRecord.compareTo(min) == -1)
                     {
                         heap.hideMin(); 
-                        hiddenElements++; 
                     }
                 }
             }           
         }  
         outputBuffer.unloadRun();
-        runs++;
-        outputBuffer.closeRunFile();   
+        outputBuffer.closeRunFile();
+        System.out.println(records); 
+    }
+    
+    public RunManager getRunManager() throws IOException
+    {
+        return recordRuns("runFile.bin");
     }
     
     public void dumpFile(String source, String outputFile) throws IOException
@@ -114,10 +116,43 @@ public class ReplacementSelection {
             for (int i = 0; i < block.length; i += 16)
             {
                 Record rec = new Record(Arrays.copyOfRange(block, i, i + 16)); 
-                writer.write(rec.getKey() + "\n");
+                writer.write(rec.getKey() + "\n"); 
                 //System.out.println("Key: " + rec.getKey() + "; Value: " + rec.getID()); 
             }
         }
+    }
+    
+    private RunManager recordRuns(String source) throws IOException
+    {
+        RunManager runManager = new RunManager(); 
+        Parser parser = new Parser(new File(source));
+        byte[] block; 
+        Record prev = null;
+        int records = 0; 
+        int startOffset = 0; 
+        int endOffset = 0;
+        while (parser.hasNextBlock())
+        {
+            block = parser.nextBlock();
+            for (int i = 0; i < block.length; i += 16)
+            {
+                Record curr = new Record(Arrays.copyOfRange(block, i, i + 16));
+                records++; 
+                endOffset += 16;
+                if (prev != null && prev.compareTo(curr) == 1) 
+                {
+                    runManager.addRun(new Run(startOffset, endOffset));
+                    startOffset = endOffset;
+                    System.out.println(records);
+                }
+                prev = curr; 
+            }
+        }
+        runManager.addRun(new Run(startOffset, endOffset));
+        startOffset = endOffset;
+        System.out.println(records);
+        runManager.printRunInfo();
+        return runManager;
     }
     
     private Record[] combineArr(Record[] arr1, Record[] arr2)

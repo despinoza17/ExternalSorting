@@ -3,10 +3,22 @@ import java.util.Arrays;
 
 public class Record implements Comparable<Record> {
     private byte[] record; 
+    private int runNumber;
     
     public Record(byte[] record)
     {
         this.record = record; 
+    }
+    
+    public Record(byte[] record, int runNumber)
+    {
+        this.record = record; 
+        this.runNumber = runNumber;
+    }
+    
+    public int getRunNumber()
+    {
+        return runNumber; 
     }
     
     public byte[] getRawRecord()
