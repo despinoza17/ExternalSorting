@@ -45,20 +45,36 @@ public class Run {
         return endOffset;
     }
     
+    public Parser getParser()
+    {
+        return parser;
+    }
+    
     public byte[] getNextBlockOrRemaining() throws IOException
     {
+        byte[] arr;
         if (currOffset == endOffset)
         {
             return null;
         }
         else if (currOffset + 8192 > endOffset)
         { 
-            return parser.readRange(currOffset, endOffset); 
+            arr = new byte[endOffset - currOffset];
+            parser.readRange(arr, currOffset, endOffset);
+            currOffset = endOffset; 
         }
         else
         {
-            return parser.readRange(startOffset, startOffset + 8192);
+            arr = new byte[8192];
+            parser.readRange(arr, currOffset, currOffset + 8192);
+            currOffset += 8192;
         }
+        return arr; 
+    }
+    
+    public void printRunInfo()
+    {
+        System.out.println("Current offset: " + currOffset); 
     }
 
 }

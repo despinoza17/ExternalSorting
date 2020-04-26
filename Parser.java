@@ -2,6 +2,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.Arrays;
 
 public class Parser {
     private RandomAccessFile reader; 
@@ -10,16 +11,24 @@ public class Parser {
     
     public Parser(File file) throws FileNotFoundException
     {
-        reader = new RandomAccessFile(file, "r"); 
+        reader = new RandomAccessFile(file, "rw"); 
         offset = 0; 
     }
     
-    public byte[] readRange(int startOffset, int endOffset) throws IOException
+    public static void printBlock(byte[] arr)
+    {
+        for (int i = 0; i < arr.length; i+=16)
+        {
+            System.out.println(new Record(Arrays.copyOfRange(arr, i, i + 16))); 
+        }
+    }
+    
+    public void readRange(byte[] arr, int startOffset, int endOffset) throws IOException
     {
         int length = endOffset - startOffset; 
-        byte[] arr = new byte[length];
-        reader.readFully(arr, startOffset, length);
-        return arr;
+        //System.out.println(startOffset + " - " + endOffset);
+        reader.seek(startOffset);
+        reader.read(arr, 0, arr.length);
     }
     
     public byte[] nextBlock() throws IOException
@@ -52,6 +61,11 @@ public class Parser {
             return false; 
         }
         return offset != reader.length(); 
+    }
+    
+    public void close() throws IOException
+    {
+        reader.close();
     }
 
 }

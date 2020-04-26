@@ -71,8 +71,6 @@ public class MinHeap<T extends Comparable<? super T>> {
         } 
     }
     
-    
-    
     public void buildHeap()
     {
         
@@ -90,6 +88,19 @@ public class MinHeap<T extends Comparable<? super T>> {
         swap(heap, 0, --n);
         siftDown(0); 
         return heap[n]; 
+    }
+    
+    public T removeMin()
+    {
+        if (n == 0)
+        {
+            return null;
+        }
+        swap(heap, 0, --n); 
+        siftDown(0); 
+        T element = heap[n];
+        heap[n] = null;
+        return element;
     }
     
     public T remove(int pos)

@@ -6,10 +6,13 @@ public class Main {
     
     public static void main(String[] args) throws IOException
     {
-        ReplacementSelection ext = new ReplacementSelection(new File("sampleInput16.bin")); 
+        ReplacementSelection ext = new ReplacementSelection(new File("64NBlocks.bin")); 
         ext.replacementSort();
-        ext.dumpFile("runFile.bin", "runFileTranslated.txt");
-        //ext.dumpFile("sampleInput16Sorted.bin", "sampleFile.txt");
+        ext.dumpFile("runFile.bin", "rf.txt");
+        MergeSort merge = new MergeSort(RunManager.getRunManager("runFile.bin")); 
+        merge.merge("runFile.bin");
+        ext.dumpFile("outputFile.bin", "outputFileTr.txt");
+        ext.dumpFile("32NBlocks.bin", "sampleFile.txt");
         
     }
 
