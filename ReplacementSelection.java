@@ -1,11 +1,10 @@
-import java.io.File; 
+import java.io.File;  
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
-
+ 
 public class ReplacementSelection {
     private MinHeap<Record> heap; 
     private InputBuffer inputBuffer; 
@@ -52,9 +51,7 @@ public class ReplacementSelection {
         
         while (parser.hasNextBlock())
         {
-            byte[] b = parser.nextBlock();
-            inputBuffer.addNextBlock(b);
-            //Parser.printBlock(b);
+            inputBuffer.addNextBlock(parser.nextBlock());
             while (heap.heapSize() != 0 || arr.length != 0)
             {
                 if (outputBuffer.isFilled())
@@ -143,7 +140,6 @@ public class ReplacementSelection {
                 else
                 {
                     heap.hideMin();
-                    System.out.println(Arrays.toString(Arrays.copyOfRange(arr,  heap.heapSize() + 1, arr.length)));
                     arr = combineArr(
                             Arrays.copyOfRange(arr, 0,
                                     heap.heapSize()),
@@ -168,24 +164,6 @@ public class ReplacementSelection {
         parser.close();
         File runfile = new File("runFile.bin");
         Files.move(runfile.toPath(), runfile.toPath().resolveSibling(recordFile.getName()), StandardCopyOption.REPLACE_EXISTING);
-    }
-    
-    public static void dumpFile(String source, String outputFile) throws IOException
-    {
-        FileWriter writer = new FileWriter(outputFile); 
-        Parser parser = new Parser(new File(source)); 
-        byte[] block; 
-        while (parser.hasNextBlock())
-        {
-            block = parser.nextBlock(); 
-            for (int i = 0; i < block.length; i += 16)
-            {
-                Record rec = new Record(Arrays.copyOfRange(block, i, i + 16)); 
-                writer.write(rec.getKey() + "\n"); 
-            }
-        }
-        parser.close();
-        writer.close();
     }
     
     private Record[] combineArr(Record[] arr1, Record[] arr2)

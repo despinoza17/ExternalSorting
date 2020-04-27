@@ -1,10 +1,7 @@
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.File; 
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 
@@ -25,7 +22,6 @@ public class MergeSort {
         Parser parser; 
         File outputFile = new File("outputFile.bin"); 
         RandomAccessFile outFile;
-        runManager.printRunInfo();
         while (runManager.getNumRuns() > 1)
         {
             outFile = new RandomAccessFile(outputFile, "rw");
@@ -40,12 +36,10 @@ public class MergeSort {
             while (currRun < runManager.getNumRuns())
             {
                 // Load first block of the 8 runs
-                while (currRun < runManager.getNumRuns() && (currRun % 8 != 0 || currRun == 0))
+                int cap = currRun + 8; 
+                while (currRun < cap && currRun < runManager.getNumRuns())
                 {       
-                    //System.out.println("Current run: " + currRun); 
-                    //runManager.getRun(currRun).printRunInfo();
                     byte[] block = runManager.getRun(currRun).getNextBlockOrRemaining();
-                    //Parser.printBlock(block);
                     int numRecords = block.length / 16; 
                     for (int i = 0; i < block.length; i += 16)
                     {
@@ -53,37 +47,22 @@ public class MergeSort {
                         heap.insert(rec);
                     }
                     recCount[currRun] = numRecords;
-                    //System.out.println("_______");
                     currRun++;
                 }
                 
-                Record prev = null; 
-                int count = 0; 
                 // Sort
                 while (heap.heapSize() > 0)
                 {
                     Record rec = heap.removeMin();
-                    //if (prev != null && prev.compareTo(rec) == 1)
-                    //{
-                    //    System.out.println(prev + " : " + rec);
-                    //}
-                    prev = rec;
-                    count++;
-                    //System.out.println(rec);
                     outFile.write(rec.getRawRecord());
                     recCount[rec.getRunNumber()]--; 
                     int exhaustedRun = checkExhaustedRuns(recCount);
                     if (exhaustedRun != -1)
                     {
-                        //System.out.println("Run " + exhaustedRun);
-                        //runManager.getRun(exhaustedRun).printRunInfo();
                         byte[] block = runManager.getRun(exhaustedRun).getNextBlockOrRemaining();
                         if (block != null)
                         {
-                            //Parser.printBlock(block);
-                            //System.out.println("_______");
                             int numRecords = block.length / 16; 
-                            //System.out.println(new Record(Arrays.copyOfRange(block, 0, 16))); 
                             for (int i = 0; i < block.length; i += 16)
                             {
                                 Record r = new Record(Arrays.copyOfRange(block, i, i + 16), exhaustedRun);
@@ -96,21 +75,14 @@ public class MergeSort {
                             recCount[exhaustedRun] = -1; 
                         }
                     }
-                }
-                //System.out.println(count);
-                        
+                }                  
             }
             outFile.close();
             parser.close();
             
             Files.move(outputFile.toPath(), outputFile.toPath().resolveSibling(fileName), StandardCopyOption.REPLACE_EXISTING);
             runManager = RunManager.getRunManager(fileName);
-            runManager.printRunInfo();
-            //Files.move(outputFile.toPath(), outputFile.toPath().resolveSibling(fileName), StandardCopyOption.REPLACE_EXISTING);
-            //ReplacementSelection.dumpFile("runFile.bin", "rft.txt");
-            //Files.deleteIfExists(outputFile.toPath());
             currRun = 0;
-            //break; 
         }
     }
     

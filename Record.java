@@ -42,7 +42,6 @@ public class Record implements Comparable<Record> {
 
     @Override
     public int compareTo(Record o) {
-        //System.out.println(o); 
         if (getKey() < o.getKey())
             return -1; 
         else if (getKey() > o.getKey())

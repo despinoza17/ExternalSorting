@@ -61,7 +61,7 @@ public class MinHeap<T extends Comparable<? super T>> {
     {
         if (n >= size)
         {
-            System.out.println("Heap is full"); 
+            //System.out.println("Heap is full"); 
             return;
         }
         int curr = n++; 

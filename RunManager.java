@@ -1,5 +1,4 @@
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.File; 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,7 +19,6 @@ public class RunManager {
         Parser parser = new Parser(new File(source));
         byte[] block; 
         Record prev = null;
-        int records = 0; 
         int startOffset = 0; 
         int endOffset = 0;
         while (parser.hasNextBlock())
@@ -29,12 +27,10 @@ public class RunManager {
             for (int i = 0; i < block.length; i += 16)
             {
                 Record curr = new Record(Arrays.copyOfRange(block, i, i + 16));
-                records++; 
                 if (prev != null && prev.compareTo(curr) == 1) 
                 {
                     runManager.addRun(new Run(startOffset, endOffset));
                     startOffset = endOffset;
-                    //System.out.println(records);
                 }
                 endOffset += 16;
                 prev = curr; 
@@ -42,7 +38,6 @@ public class RunManager {
         }
         runManager.addRun(new Run(startOffset, endOffset));
         startOffset = endOffset;
-        //runManager.printRunInfo();
         parser.close();
         return runManager;
     }
