@@ -6,6 +6,7 @@ import java.util.Arrays;
 
 public class RunManager {
     private ArrayList<Run> runs;
+    private String fileName; 
     
     public RunManager()
     {
@@ -14,7 +15,8 @@ public class RunManager {
     
     public static RunManager getRunManager(String source) throws IOException
     {
-        RunManager runManager = new RunManager(); 
+        RunManager runManager = new RunManager();
+        runManager.fileName = source;
         Parser parser = new Parser(new File(source));
         byte[] block; 
         Record prev = null;
@@ -51,6 +53,11 @@ public class RunManager {
         {
             runs.get(i).setParser(parser); 
         }
+    }
+    
+    public String getFileName()
+    {
+        return fileName; 
     }
     
     public int getNumRuns()

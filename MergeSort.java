@@ -10,21 +10,22 @@ import java.util.Arrays;
 
 public class MergeSort {
     private RunManager runManager; 
+    private String fileName; 
     
     public MergeSort(RunManager runManager)
     {
         this.runManager = runManager; 
     }
     
-    public void merge(String runFile) throws IOException
+    public void merge() throws IOException
     {
+        this.fileName = runManager.getFileName();
         int currRun = 0; 
-        File origFile = new File(runFile);
+        File origFile = new File(this.fileName);
         Parser parser; 
         File outputFile = new File("outputFile.bin"); 
         RandomAccessFile outFile;
-        //runManager.printRunInfo();
-        
+        runManager.printRunInfo();
         while (runManager.getNumRuns() > 1)
         {
             outFile = new RandomAccessFile(outputFile, "rw");
@@ -102,11 +103,10 @@ public class MergeSort {
             outFile.close();
             parser.close();
             
-            runManager = RunManager.getRunManager("outputFile.bin");
+            Files.move(outputFile.toPath(), outputFile.toPath().resolveSibling(fileName), StandardCopyOption.REPLACE_EXISTING);
+            runManager = RunManager.getRunManager(fileName);
             runManager.printRunInfo();
-            //File temp = new File("outputFile.bin"); 
-            //File file = new File(runFile); 
-            //Files.move(outputFile.toPath(), outputFile.toPath().resolveSibling(runFile), StandardCopyOption.REPLACE_EXISTING);
+            //Files.move(outputFile.toPath(), outputFile.toPath().resolveSibling(fileName), StandardCopyOption.REPLACE_EXISTING);
             //ReplacementSelection.dumpFile("runFile.bin", "rft.txt");
             //Files.deleteIfExists(outputFile.toPath());
             currRun = 0;

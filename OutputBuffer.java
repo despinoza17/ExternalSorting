@@ -34,6 +34,11 @@ public class OutputBuffer {
         return offset == 8192; 
     }
     
+    public boolean isEmpty()
+    {
+        return offset == 0; 
+    }
+    
     public byte[] getLastRecordArr()
     {
         return Arrays.copyOfRange(buffer, offset - 16, offset); 
@@ -46,7 +51,7 @@ public class OutputBuffer {
     
     public void unloadRun() throws IOException
     {
-        runFile.write(buffer);
+        runFile.write(buffer, 0, offset);
         buffer = new byte[8192]; 
         offset = 0;
     }
@@ -54,6 +59,11 @@ public class OutputBuffer {
     public void closeRunFile() throws IOException
     {
         runFile.close(); 
+    }
+    
+    public void printOutputBuffer()
+    {
+        Parser.printBlock(getArr());
     }
     
     

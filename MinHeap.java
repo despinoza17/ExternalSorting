@@ -4,9 +4,11 @@ public class MinHeap<T extends Comparable<? super T>> {
     private T[] heap; // Pointer to heap array
     private int size; // Max size of the heap
     private int n; // Number of things now in the heap
+    private int hiddenValues; 
     
     public MinHeap(T[] h, int num, int max)
     {
+        hiddenValues = 0; 
         heap = h; 
         n = num;
         size = max; 
@@ -87,7 +89,13 @@ public class MinHeap<T extends Comparable<? super T>> {
         }
         swap(heap, 0, --n);
         siftDown(0); 
+        hiddenValues++; 
         return heap[n]; 
+    }
+    
+    public boolean filledWithHiddenValues()
+    {
+        return hiddenValues == heap.length;
     }
     
     public T removeMin()

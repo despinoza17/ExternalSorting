@@ -1,4 +1,4 @@
-import java.io.File;
+import java.io.File; 
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -16,7 +16,7 @@ public class ReplacementSelection {
     
     public ReplacementSelection(File recordFile) throws FileNotFoundException
     {
-        this.recordFile = recordFile; 
+        this.recordFile = recordFile;
         arr = new Record[4096]; 
         heap = new MinHeap<Record>(arr, 0, 4096);
         inputBuffer = new InputBuffer(new byte[8192]); 
@@ -26,7 +26,6 @@ public class ReplacementSelection {
     
     public void replacementSort() throws IOException
     {
-        int hiddenElements = 0; 
         int count = 0;
         // SET UP -- 
         // Fill heap with 8 blocks
@@ -40,31 +39,38 @@ public class ReplacementSelection {
                 {
                     Record rec = new Record(Arrays.copyOfRange(block, j, j + 16)); 
                     heap.insert(rec);
+                    count++;
                 }
-                count++;
             }
         }
-        System.out.println(count);
         
-        int runs = 0;
-        int offset = 0;
-        int records = 0;
-        Record prev = null;
-
+        if (heap.heapSize() < 4096)
+        {
+            arr = Arrays.copyOfRange(arr, 0, count);
+            heap = new MinHeap<Record>(arr, count, count);
+        }
+        
         while (parser.hasNextBlock())
         {
-            inputBuffer.addNextBlock(parser.nextBlock());
+            byte[] b = parser.nextBlock();
+            inputBuffer.addNextBlock(b);
+            //Parser.printBlock(b);
             while (heap.heapSize() != 0 || arr.length != 0)
             {
                 if (outputBuffer.isFilled())
                 {
                     outputBuffer.unloadRun();
                 }
+                if (heap.filledWithHiddenValues())
+                {
+                    outputBuffer.unloadRun();
+                    arr = Arrays.copyOfRange(arr, 0, arr.length);
+                    heap = new MinHeap<Record>(arr, arr.length, arr.length);
+                }
                 
 
                 Record min = heap.getMin();
                 outputBuffer.insertRecordArr(min.getRawRecord());
-                records++;
                 
                 if (inputBuffer.isEmpty())
                 {
@@ -81,9 +87,7 @@ public class ReplacementSelection {
                     }
                     else
                     {
-                        //System.out.println(min); 
                         heap.hideMin();
-                        //System.out.println(heap.getElement(heap.heapSize()));
                         arr = combineArr(
                                 Arrays.copyOfRange(arr, 0,
                                         heap.heapSize()),
@@ -101,20 +105,27 @@ public class ReplacementSelection {
                     {
                         heap.hideMin(); 
                     }
+                    
                 }
             }           
         }  
+        inputBuffer.clearBuffer();
         while (heap.heapSize() != 0 || arr.length != 0)
         {
             if (outputBuffer.isFilled())
             {
                 outputBuffer.unloadRun();
             }
+            if (heap.filledWithHiddenValues())
+            {
+                outputBuffer.unloadRun();
+                arr = Arrays.copyOfRange(arr, 0, arr.length);
+                heap = new MinHeap<Record>(arr, arr.length, arr.length);
+            }
             
 
             Record min = heap.getMin();
             outputBuffer.insertRecordArr(min.getRawRecord());
-            records++;
             
             if (inputBuffer.isEmpty())
             {
@@ -131,9 +142,8 @@ public class ReplacementSelection {
                 }
                 else
                 {
-                    //System.out.println(min); 
                     heap.hideMin();
-                    //System.out.println(heap.getElement(heap.heapSize()));
+                    System.out.println(Arrays.toString(Arrays.copyOfRange(arr,  heap.heapSize() + 1, arr.length)));
                     arr = combineArr(
                             Arrays.copyOfRange(arr, 0,
                                     heap.heapSize()),
@@ -156,9 +166,8 @@ public class ReplacementSelection {
         outputBuffer.unloadRun();
         outputBuffer.closeRunFile();
         parser.close();
-        //File runfile = new File("runFile.bin");
-        //Files.move(runfile.toPath(), recordFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-        //System.out.println(records); 
+        File runfile = new File("runFile.bin");
+        Files.move(runfile.toPath(), runfile.toPath().resolveSibling(recordFile.getName()), StandardCopyOption.REPLACE_EXISTING);
     }
     
     public static void dumpFile(String source, String outputFile) throws IOException
@@ -173,7 +182,6 @@ public class ReplacementSelection {
             {
                 Record rec = new Record(Arrays.copyOfRange(block, i, i + 16)); 
                 writer.write(rec.getKey() + "\n"); 
-                //System.out.println("Key: " + rec.getKey() + "; Value: " + rec.getID()); 
             }
         }
         parser.close();
@@ -182,8 +190,6 @@ public class ReplacementSelection {
     
     private Record[] combineArr(Record[] arr1, Record[] arr2)
     {
-        //System.out.println(Arrays.toString(arr1)); 
-        //System.out.println(Arrays.toString(arr2));
         int length = arr1.length + arr2.length;
         Record[] result = new Record[length];
         for (int i = 0; i < arr1.length; i++)
@@ -194,8 +200,6 @@ public class ReplacementSelection {
         {
             result[j] = arr2[j - arr1.length];
         }
-        //System.arraycopy(arr1, 0, result, 0, arr1.length);
-        //System.arraycopy(arr2, 0, result, arr1.length, arr2.length);
         return result;
     }
 }

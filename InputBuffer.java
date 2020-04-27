@@ -29,7 +29,7 @@ public class InputBuffer {
     
     public boolean isEmpty()
     {
-        return offset == 8192; 
+        return offset == 8192 || buffer == null; 
     }
     
 
