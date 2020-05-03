@@ -1,13 +1,26 @@
 import student.TestCase;
 
+/**
+ * MinHeap Test
+ * 
+ * @author despi17
+ * @author oli1230
+ * @version 4.27.2020
+ */
 public class MinHeapTest extends TestCase {
     private MinHeap<Integer> heap; 
     
+    /**
+     * Setup method
+     */
     public void setUp()
     {
         heap = new MinHeap<Integer>(new Integer[20], 0, 20); 
     }
     
+    /**
+     * Tests multiple methods of the MinHeap class
+     */
     public void testComplex()
     {
         heap.insert(2);
@@ -23,30 +36,26 @@ public class MinHeapTest extends TestCase {
         heap.insert(25);
         heap.insert(30);
         
-        //heap.printArray();
-        //heap.removeMin();
-        //heap.printArray();
+
         heap.hideMin();
-        //heap.printArray();
+
         heap.hideMin(); 
-        //heap.printArray();
+
         heap.hideMin(); 
-        //heap.printArray();
-        //heap.unhideElements();
+
         heap.buildHeap();
         heap.insert(4); 
-        //heap.removeMin(); 
+
         heap.hideMin();
-        //heap.unhideElements();
+
         heap.buildHeap();
         heap.insert(89);
         assertEquals(10, heap.heapSize());
-
-        
-
-        //heap.printArray();
     }
     
+    /**
+     * Tests multiple methods of the MinHeap class
+     */
     public void testComplexTwo()
     {
         Integer result = heap.remove(0); 
@@ -59,12 +68,12 @@ public class MinHeapTest extends TestCase {
         
         heap.insert(2);
         result = heap.removeMin();
-        assert(result == 2);
+        assert (result == 2);
         assertEquals(0, heap.heapSize());
         
         heap.insert(2);
         result = heap.remove(0); 
-        assert(2 == result);
+        assert (2 == result);
         assertEquals(0, heap.heapSize());
         
         result = heap.remove(2);
@@ -73,13 +82,13 @@ public class MinHeapTest extends TestCase {
         
         heap.insert(3);
         result = heap.remove(0);
-        assert(3 == result);
+        assert (3 == result);
         assertEquals(0, heap.heapSize());
         
         heap.insert(3);
         heap.modify(0, 2);
         result = heap.getMin();
-        assert(2 == result);
+        assert (2 == result);
         assertEquals(1, heap.heapSize());
         
         heap.modify(2, 4);
@@ -99,13 +108,6 @@ public class MinHeapTest extends TestCase {
         {
             heap.hideMin();
         }
-        assertTrue(heap.filledWithHiddenValues());
-        
-        
-                
-        
+        assertTrue(heap.filledWithHiddenValues()); 
     }
-    
-    
-
 }

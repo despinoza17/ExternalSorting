@@ -1,24 +1,39 @@
-import java.io.File; 
+import java.io.File;  
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 
+/**
+ * MergeSort performs multiway merge
+ * 
+ * @author despi17
+ * @author oli1230
+ * @version 4.27.2020
+ *
+ */
 public class MergeSort {
     private RunManager runManager; 
-    private String fileName; 
     
+    /**
+     * MergeSort one argument constructor
+     * @param runManager RunManager tracks offsets
+     */
     public MergeSort(RunManager runManager)
     {
         this.runManager = runManager; 
     }
     
+    /**
+     * Performs multiway merge sort
+     * @throws IOException
+     */
     public void merge() throws IOException
     {
-        this.fileName = runManager.getFileName();
+        String fileName = runManager.getFileName();
         int currRun = 0; 
-        File origFile = new File(this.fileName);
+        File origFile = new File(fileName);
         Parser parser; 
         File outputFile = new File("outputFile.bin"); 
         RandomAccessFile outFile;
@@ -39,11 +54,13 @@ public class MergeSort {
                 int cap = currRun + 8; 
                 while (currRun < cap && currRun < runManager.getNumRuns())
                 {       
-                    byte[] block = runManager.getRun(currRun).getNextBlockOrRemaining();
+                    byte[] block = runManager.getRun(currRun)
+                            .getNextBlockOrRemaining();
                     int numRecords = block.length / 16; 
                     for (int i = 0; i < block.length; i += 16)
                     {
-                        Record rec = new Record(Arrays.copyOfRange(block, i, i + 16), currRun);
+                        Record rec = new Record(Arrays.copyOfRange(
+                                block, i, i + 16), currRun);
                         heap.insert(rec);
                     }
                     recCount[currRun] = numRecords;
@@ -59,13 +76,16 @@ public class MergeSort {
                     int exhaustedRun = checkExhaustedRuns(recCount);
                     if (exhaustedRun != -1)
                     {
-                        byte[] block = runManager.getRun(exhaustedRun).getNextBlockOrRemaining();
+                        byte[] block = runManager.getRun(exhaustedRun)
+                                .getNextBlockOrRemaining();
                         if (block != null)
                         {
                             int numRecords = block.length / 16; 
                             for (int i = 0; i < block.length; i += 16)
                             {
-                                Record r = new Record(Arrays.copyOfRange(block, i, i + 16), exhaustedRun);
+                                Record r = new Record(
+                                        Arrays.copyOfRange(block, i, i + 16),
+                                        exhaustedRun);
                                 heap.insert(r);
                             }
                             recCount[exhaustedRun] = numRecords;
@@ -80,12 +100,21 @@ public class MergeSort {
             outFile.close();
             parser.close();
             
-            Files.move(outputFile.toPath(), outputFile.toPath().resolveSibling(fileName), StandardCopyOption.REPLACE_EXISTING);
+            Files.move(outputFile.toPath(), outputFile.toPath()
+                    .resolveSibling(fileName),
+                    StandardCopyOption.REPLACE_EXISTING);
             runManager = RunManager.getRunManager(fileName);
             currRun = 0;
         }
     }
     
+    /**
+     * Checks if any of the runs have been exhausted during
+     * multiway merge
+     * @param recCount array that keeps track of record count
+     * @return run number if exhausted run exists, negative one 
+     *          otherwise
+     */
     private int checkExhaustedRuns(int[] recCount)
     {
         for (int i = 0; i < recCount.length; i++)

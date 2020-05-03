@@ -1,10 +1,21 @@
 import java.nio.ByteBuffer;
 import java.util.Arrays;
-
 import student.TestCase; 
+
+/**
+ * Record test class
+ * 
+ * @author despi17
+ * @author oli1230
+ * @version 4.27.2020
+ */
 public class RecordTest extends TestCase {
     private Record rec;
     private byte[] rawRecord;
+    
+    /**
+     * Sets up test cases
+     */
     public void setUp()
     {
         long id = 553; 
@@ -26,13 +37,16 @@ public class RecordTest extends TestCase {
         rec = new Record(recordArr);
     }
     
+    /**
+     * Tests multiple Record methods
+     */
     public void testComplex()
     {
         assertTrue(Arrays.equals(rawRecord, rec.getRawRecord()));
         
         assertEquals(553, rec.getID()); 
         
-        assert(5.09 == rec.getKey());
+        assert (5.09 == rec.getKey());
         
         assertEquals("5.09", rec.toString());
         

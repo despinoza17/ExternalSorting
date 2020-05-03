@@ -5,6 +5,15 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
  
+/**
+ * ReplacementSelection performs 
+ * replacement selection sort
+ * 
+ * @author despi17
+ * @author oli1230
+ * @version 4.27.2020
+ *
+ */
 public class ReplacementSelection {
     private MinHeap<Record> heap; 
     private InputBuffer inputBuffer; 
@@ -13,7 +22,13 @@ public class ReplacementSelection {
     private Parser parser;
     private Record[] arr; 
     
-    public ReplacementSelection(File recordFile) throws FileNotFoundException
+    /**
+     * ReplacementSelection sort
+     * @param recordFile Record file
+     * @throws FileNotFoundException
+     */
+    public ReplacementSelection(File recordFile)
+            throws FileNotFoundException
     {
         this.recordFile = recordFile;
         arr = new Record[4096]; 
@@ -23,6 +38,10 @@ public class ReplacementSelection {
         parser = new Parser(recordFile); 
     }
     
+    /**
+     * Performs replacement selection sort
+     * @throws IOException
+     */
     public void replacementSort() throws IOException
     {
         int count = 0;
@@ -36,7 +55,8 @@ public class ReplacementSelection {
                 block = parser.nextBlock();
                 for (int j = 0; j < block.length; j += 16)
                 {
-                    Record rec = new Record(Arrays.copyOfRange(block, j, j + 16)); 
+                    Record rec = new Record(
+                            Arrays.copyOfRange(block, j, j + 16)); 
                     heap.insert(rec);
                     count++;
                 }
@@ -61,8 +81,10 @@ public class ReplacementSelection {
                 if (heap.filledWithHiddenValues())
                 {
                     outputBuffer.unloadRun();
-                    arr = Arrays.copyOfRange(arr, 0, arr.length);
-                    heap = new MinHeap<Record>(arr, arr.length, arr.length);
+                    arr = Arrays.copyOfRange(
+                            arr, 0, arr.length);
+                    heap = new MinHeap<Record>(
+                            arr, arr.length, arr.length);
                 }
                 
 
@@ -74,7 +96,8 @@ public class ReplacementSelection {
                     if (parser.hasNextBlock())
                     {
                         inputBuffer.addNextBlock(parser.nextBlock());
-                        Record currRecord = new Record(inputBuffer.getNextRecordArr());
+                        Record currRecord = new Record(
+                                inputBuffer.getNextRecordArr());
                         heap.modify(0, currRecord);
                         if (currRecord.compareTo(min) == -1)
                         {
@@ -90,13 +113,15 @@ public class ReplacementSelection {
                                         heap.heapSize()),
                                 Arrays.copyOfRange(arr,
                                         heap.heapSize() + 1, arr.length));
-                        heap = new MinHeap<Record>(arr, arr.length, arr.length); 
+                        heap = new MinHeap<Record>(
+                                arr, arr.length, arr.length); 
                     }
                     
                 }
                 else
                 {
-                    Record currRecord = new Record(inputBuffer.getNextRecordArr());
+                    Record currRecord = new Record(
+                            inputBuffer.getNextRecordArr());
                     heap.modify(0, currRecord);
                     if (currRecord.compareTo(min) == -1)
                     {
@@ -129,7 +154,8 @@ public class ReplacementSelection {
                 if (parser.hasNextBlock())
                 {
                     inputBuffer.addNextBlock(parser.nextBlock());
-                    Record currRecord = new Record(inputBuffer.getNextRecordArr());
+                    Record currRecord = new Record(
+                            inputBuffer.getNextRecordArr());
                     heap.modify(0, currRecord);
                     if (currRecord.compareTo(min) == -1)
                     {
@@ -163,9 +189,17 @@ public class ReplacementSelection {
         outputBuffer.closeRunFile();
         parser.close();
         File runfile = new File("runFile.bin");
-        Files.move(runfile.toPath(), runfile.toPath().resolveSibling(recordFile.getName()), StandardCopyOption.REPLACE_EXISTING);
+        Files.move(runfile.toPath(), runfile.toPath().
+                resolveSibling(recordFile.getName()),
+                StandardCopyOption.REPLACE_EXISTING);
     }
     
+    /**
+     * Combines two arrays
+     * @param arr1 first array to combine
+     * @param arr2 second array to combine
+     * @return combined array
+     */
     private Record[] combineArr(Record[] arr1, Record[] arr2)
     {
         int length = arr1.length + arr2.length;
